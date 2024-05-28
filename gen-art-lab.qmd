@@ -142,8 +142,6 @@ circle_art <- additive_circles(n = 50, pixels = 2000, seed = 13)
 ggplot(circle_art, aes(x, y, fill = paint)) +
   geom_raster(show.legend = FALSE) + 
   theme_void()
-
-#ggsave("circles.png", width = 5, height = 5)
 ```
 
 
@@ -173,7 +171,9 @@ circle_scape <- circle_array |>
     shadowmap = circle_shadow,
     max_darken = .1
   )
-
+png(filename="normal_mountain.png")
 plot_map(circle_scape, rotate = 270)
+dev.off()
+#ggsave("normal_mountain.png", width = 5, height = 5)
 ```
 
