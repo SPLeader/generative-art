@@ -4,3 +4,48 @@ format: html
 editor: visual
 ---
 
+# Load packages
+
+```{r}
+library(tidyverse)
+library(tibble)
+library(scales)
+```
+
+# Art Piece One
+
+```{r}
+iris %>% 
+  rename(sep_len = Sepal.Length,
+         sep_wid = Sepal.Width,
+         pet_len = Petal.Length,
+         pet_wid = Petal.Width) %>% 
+  ggplot(
+    aes(
+      x = sep_wid,
+      y = pet_wid,
+      xend = sep_len,
+      yend = pet_len,
+      color = pet_wid,
+      linewidth = sep_len
+      
+    )
+  ) +
+  scale_linewidth(range = c(0.5, 1)) +
+  coord_polar(clip = "off") +
+  geom_segment() +
+  guides(
+      color = guide_none(),
+      linewidth = guide_none(),
+      fill = guide_none(),
+      shape = guide_none()
+    ) +
+  theme_void() +
+  scale_color_gradient2(
+    low = "#7251dd",
+    mid = "#9159c3",
+    high = "#cecafc"
+  ) 
+```
+
+
