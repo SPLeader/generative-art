@@ -1,0 +1,6 @@
+---
+title: "Generative Art Lab"
+format: html
+editor: visual
+---
+
