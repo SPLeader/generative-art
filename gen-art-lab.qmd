@@ -2,11 +2,24 @@
 title: "Generative Art Lab"
 format: html
 editor: visual
+self-contained: true
 ---
+
+# Preface
+
+The original functions adapted for usage in my art pieces can be found in the following posts by Danielle Navarro:
+
+[https://art-from-code.netlify.app/day-1/session-1/](https://art-from-code.netlify.app/day-1/session-1/)
+
+[https://art-from-code.netlify.app/day-1/session-4/](https://art-from-code.netlify.app/day-1/session-4/)
+
+
+
 
 # Load packages
 
 ```{r}
+#| message: false
 library(rayshader)
 library(tibble)
 library(ambient)
@@ -21,19 +34,16 @@ library(scales)
 # Art Piece One
 
 ```{r}
+#| fig-cap: "Pupil of the Iris"
 iris %>% 
-  rename(sep_len = Sepal.Length,
-         sep_wid = Sepal.Width,
-         pet_len = Petal.Length,
-         pet_wid = Petal.Width) %>% 
   ggplot(
     aes(
-      x = sep_wid,
-      y = pet_wid,
-      xend = sep_len,
-      yend = pet_len,
-      color = pet_wid,
-      linewidth = sep_len
+      x = Sepal.Width,
+      y = Petal.Width,
+      xend = Sepal.Length,
+      yend = Petal.Length,
+      color = Petal.Width,
+      linewidth = Sepal.Length
       
     )
   ) +
@@ -54,49 +64,19 @@ iris %>%
     mid = "#9159c3",
     high = "#cecafc"
   ) 
-
-ggsave("iris_spiral.png")
-```
-
-
-Darkest in center
-medium in between
-lightest outside
-
-```{r}
-sample_data <- function(seed = NULL, n = 100){
-  if(!is.null(seed)) set.seed(seed)
-  dat <- tibble(
-    x0 = runif(n),
-    y0 = runif(n),
-    x1 = x0 + runif(n, min = -.2, max = .2),
-    y1 = y0 + runif(n, min = -.2, max = .2),
-    shade = runif(n), 
-    size = runif(n),
-    shape = factor(sample(0:22, size = n, replace = TRUE))
-  )
-}
 ```
 
 
 
-```{r}
-pal <- c("#7251dd", "#9159c3", "#cecafc")
-show_col(pal)
-palette_fn <- colorRampPalette(pal)
-image(
-  x = matrix(1:100, ncol = 1), 
-  col = palette_fn(100),
-  useRaster = TRUE,
-  axes = FALSE
-)
-```
+The colors used to create the gradient for this piece were sampled from real images of the different iris species: virginica, setosa, and versicolor. The different clusters of lines and colors roughly correspond to the different species of flower. 
 
-
+The choice to use polar coordinates for this plot is what gives the design its signature spiral. The individual segments have differing lengths according to the ratio between the sepal and petal widths and lengths. The lines also appear string-like because I limited the range of the linewidths to between only 0.5 and 1. 
 
 
 
 # Art Piece Two
+
+## Iteration One
 
 ```{r}
 is_within_circle <- function(x_coord, y_coord, x_center, y_center, radius) {
@@ -136,7 +116,6 @@ additive_circles <- function(n = 5, pixels = 1000, seed = NULL) {
 }
 ```
 
-
 ```{r}
 circle_art <- additive_circles(n = 50, pixels = 2000, seed = 13)
 
@@ -146,7 +125,7 @@ ggplot(circle_art, aes(x, y, fill = paint)) +
   theme_void()
 ```
 
-
+## Iteration Two
 
 ```{r}
 circle_array <- circle_art |>
@@ -163,19 +142,22 @@ circle_shadow <- ray_shade(
 plot_map(circle_shadow, rotate = 270)
 ```
 
-
-
+## Final Piece
 
 ```{r}
+#| fig-cap: "Peak Normality"
 circle_scape <- circle_array |> 
   height_shade() |>
   add_shadow(
     shadowmap = circle_shadow,
     max_darken = .1
   )
-png(filename="normal_mountain.png")
+
 plot_map(circle_scape, rotate = 270)
-dev.off()
-#ggsave("normal_mountain.png", width = 5, height = 5)
 ```
 
+
+
+The shadow of this randomly generated mountain follows a roughly bell-shaped curve, with imperfections due to indeterminism in the size of the circles and the sampling variability of the points generated from the normal distribution. 
+
+I generated 50 unique circles, each with its own x and y coordinate. The x-values were randomly generated from a normal distribution, which is why we see an approximate bell curve as the shadow of the mountain. The y-values are a function of the x-values, with larger y-values associated with the middle x-values and smaller y-values trailing off left and right. Then, the number of overlapping circles on a given point determines the height of the mountain at that point. As such, the mountain is taller near the mean of the generated x-values (where there are more overlapping circles), and gets shorter near the x-values far from the mean. 
