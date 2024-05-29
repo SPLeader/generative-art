@@ -54,6 +54,8 @@ iris %>%
     mid = "#9159c3",
     high = "#cecafc"
   ) 
+
+ggsave("iris_spiral.png")
 ```
 
 
